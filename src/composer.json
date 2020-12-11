@@ -1,0 +1,18 @@
+{
+    "require": {
+        "slim/slim": "3.*",
+        "slim/php-view": "^2.0",
+        "monolog/monolog": "^2.1",
+        "robmorgan/phinx": "^0.5.1",
+        "doctrine/orm": "^2.8",
+        "tuupola/slim-basic-auth": "^3.3",
+        "oscarotero/psr7-middlewares": "^3.21",
+        "firebase/php-jwt": "^5.2",
+        "tuupola/slim-jwt-auth": "^3.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "./"
+        }
+    }
+}
