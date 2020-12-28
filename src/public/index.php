@@ -8,18 +8,9 @@ use Firebase\JWT\JWT;
 
 require '../config.php';
 
-/*Create Routes*/
+/*Routes GEY*/
 $app->get('/questao/{id_questao}', function (Request $request, Response $response, array $args) {
-    /*$stmt = $this->db_Connect->query("SELECT * FROM questao where id_questao = {$args['id_questao']}");
-    $questao = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $stmt2 = $this->db_Connect->query("SELECT id_questao_alternativa, texto, id_questao, CASE correta WHEN 0 THEN 'false' ELSE 'true' END as correta FROM ogs.questao_alternativa WHERE id_questao = {$args['id_questao']}");
-    $questaoa = $stmt2->fetchAll(PDO::FETCH_ASSOC);
-    $questao[0]['alternativas'] = $questaoa;
-    $response->getBody()->write(json_encode($questao[0],  256));
-    //return $response->withHeader('Content-type', 'application/json')
-     //       ->withStatus(200);
-    //echo json_encode($questao[0],  256);*/
-    
+  
     $id_questao = $args['id_questao'];
     $entityManager = $this->get('em');
     
@@ -48,25 +39,94 @@ $app->get('/questao_alternativa/{id_questao_alternativa}', function (Request $re
 
 });
 
+$app->get('/aluno/{id_aluno}', function (Request $request, Response $response, array $args) {
+    $id_aluno = $args['id_aluno'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Aluno');
+    $aluno = $repository->find($id_aluno);
+    
+    $response->getBody()->write(json_encode($aluno,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/assunto/{id_assunto}', function (Request $request, Response $response, array $args) {
+    $id_assunto = $args['id_assunto'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Assunto');
+    $assunto = $repository->find($id_assunto);
+    
+    $response->getBody()->write(json_encode($assunto,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/frequencia/{id_frequecia}', function (Request $request, Response $response, array $args) {
+    $id_frequecia = $args['id_frequecia'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Frequencia');
+    $frequencia = $repository->find($id_frequecia);
+    
+    $response->getBody()->write(json_encode($frequencia,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/jogador/{id_jogador}', function (Request $request, Response $response, array $args) {
+    $id_jogador = $args['id_jogador'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Jogador');
+    $jogador = $repository->find($id_jogador);
+    
+    $response->getBody()->write(json_encode($jogador,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/tribo/{id_tribo}', function (Request $request, Response $response, array $args) {
+    $id_tribo = $args['id_tribo'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Tribo');
+    $tribo = $repository->find($id_tribo);
+    /**
+     * Verifica se existe a tribo com a ID informada
+     */
+    if (!$tribo) {
+        $logger = $this->get('logger');
+        $logger->warning("Tribo {$id_tribo} Not Found");
+        throw new \Exception("Tribo not Found", 404);
+    }       
+    
+    $response->getBody()->write(json_encode($tribo,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
 /**
  * HTTP Auth - Autenticação minimalista para retornar um JWT
  */
 $app->get('/auth', function (Request $request, Response $response) use ($app) {
-
-     $key = $this->get("secretkey");
-
-    $token = array(
-        "user" => "@fidelissauro",
-        "twitter" => "https://twitter.com/fidelissauro",
-        "github" => "https://github.com/msfidelis"
-    );
-
-    $jwt = JWT::encode($token, $key);
-
-    return $response->withJson(["auth-jwt" => $jwt], 200)
+    
+    $now = new DateTime( $request->getQueryParams()['DATA_ACESSO']);
+    $future = date_add($now, new DateInterval("PT15H50M0S"));
+    $server = $request->getServerParams();
+    
+    $payload = [
+        "usuarioSenha" => $request->getUri()->getUserInfo(),
+        "iat" => $now->getTimeStamp(),
+        "sub" => $server["PHP_AUTH_USER"]
+    ];
+    $token = JWT::encode($payload, $this->get("secretkey"), "HS512");
+    
+    return $response->withJson(["API_CHAVE" => $token], 200)
         ->withHeader('Content-type', 'application/json'); 
+    
 });
-
 
 /*
 /*Working with POST Data

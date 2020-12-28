@@ -33,11 +33,19 @@ class Questao {
     public $nivel;
     
     /** 
-     * @OneToMany(targetEntity="Questao_alternativa", mappedBy="questao") 
-     * @JoinColumn(name="id_questao", referencedColumnName="id_questao")
+     * @OneToMany(targetEntity="Questao_alternativa", mappedBy="Questao", cascade={"persist", "remove"}) 
      */
     public $alternativas;
+    
+    /**
+     * @OneToMany(targetEntity="Questao_aluno", mappedBy="Questao", cascade={"persist", "remove"}) 
+     */
+    public $respostas;
 
+    public function __construct(){
+        $this->alternativas = new ArrayCollection();
+    }
+    
     
     public function getIdQuestao(){
         return $this->id_questao;

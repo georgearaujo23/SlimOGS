@@ -31,12 +31,6 @@ class Questao_alternativa {
      * @Column(type="integer") 
      */
     public $id_questao;
-        
-     /**
-     * @ORM\ManyToOne(targetEntity="Questao", inversedBy="alternativas")
-     * @JoinColumn(name="id_questao", referencedColumnName="id_questao")
-     */
-    public $questao;
     
     public function getIdQuestaoAlternativa(){
         return $this->id_questao_alternativa;
