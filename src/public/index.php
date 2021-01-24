@@ -4,6 +4,7 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 use App\Models\Entity\Questao;
 use App\Models\Entity\Questao_alternativa;
+use App\Models\Entity\Estacao_melhoria_estacao;
 use Firebase\JWT\JWT;
 
 require '../config.php';
@@ -107,6 +108,104 @@ $app->get('/tribo/{id_tribo}', function (Request $request, Response $response, a
 
 });
 
+$app->get('/triboPorEmail/{email}', function (Request $request, Response $response, array $args) {
+    $email = $args['email'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Jogador');
+    $jogador = $repository->findOneBy(array('email' => $email));
+    $repository = $entityManager->getRepository('App\Models\Entity\Tribo');
+    $tribo = $repository->findOneBy(array('id_jogador' => $jogador->id_jogador));
+    /**
+     * Verifica se existe a tribo com a ID informada
+     */
+    if (!$tribo) {
+        $logger = $this->get('logger');
+        $logger->warning("Tribo {$id_tribo} Not Found");
+        throw new \Exception("Tribo not Found {$jogador->id_jogador}", 404);
+    }       
+    
+    $repository = $entityManager->getRepository('App\Models\Entity\Estacao');
+    $tribo->estacoes = $repository->findBy(array('id_tribo' => $tribo->id_tribo));
+    
+    $response->getBody()->write(json_encode($tribo,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/estacaomelhoriaPorTipoNivel', function (Request $request, Response $response) {
+    $params = (object) $request->getQueryParams();
+    $id_estacao_tipo = $params->id_estacao_tipo;
+    $nivel = $params->nivel;
+     
+    $entityManager = $this->get('em');
+    $query = $entityManager->createQuery('SELECT u FROM App\Models\Entity\Estacao_melhoria u '
+            . 'WHERE u.id_estacao_tipo = ?1'
+            . 'AND u.nivel <= ?2');
+    $query->setParameter(1, $id_estacao_tipo);
+    $query->setParameter(2, $nivel);
+    $estacao_tipo = $query->getResult(); 
+    
+    if (!$estacao_tipo) {
+        $logger = $this->get('logger');
+        $logger->warning("EstaçãoMelhoria not Found para tipo estação {$id_estacao_tipo}");
+        $response->getBody()->write('{ "melhorias": [] }');
+        return $response->withHeader('Content-type', 'application/json')
+                ->withStatus(200);
+    }
+    
+    $response->getBody()->write('{ "melhorias": ' . json_encode($estacao_tipo,  256) ."}");
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/estacaoMelhoriaEstacaoPorEstacao', function (Request $request, Response $response) {
+    $params = (object) $request->getQueryParams();
+    $id_estacao = $params->id_estacao;
+     
+    $entityManager = $this->get('em');
+    $query = $entityManager->createQuery('SELECT u, e FROM App\Models\Entity\Estacao_melhoria_estacao u '
+            . 'JOIN u.estacao_melhoria e '
+            . 'WHERE u.id_estacao = ?1');
+    $query->setParameter(1, $id_estacao);
+    $estacao_melhoria_estacao = $query->getResult(); 
+    
+    if (!$estacao_melhoria_estacao) {
+        $logger = $this->get('logger');
+        $logger->warning("EstaçãoMelhoriaEstacao not Found para id_estacao {$id_estacao}");
+        $response->getBody()->write('{ "melhorias": [] }');
+        return $response->withHeader('Content-type', 'application/json')
+                ->withStatus(200);
+    }
+    
+    $response->getBody()->write('{ "melhorias": ' . json_encode($estacao_melhoria_estacao,  256) ."}");
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+$app->get('/estacaoTipo/{id_estacao_Tipo}', function (Request $request, Response $response, array $args) {
+    $id_estacao_Tipo = $args['id_estacao_Tipo'];
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Estacao_tipo');
+    $estacao_Tipo = $repository->find($id_estacao_Tipo);
+    /**
+     * Verifica se existe a tribo com a ID informada
+     */
+    if (!$estacao_Tipo) {
+        $logger = $this->get('logger');
+        $logger->warning("EstacaoTipo {$id_estacao_Tipo} Not Found");
+        throw new \Exception("EstacaoTipo {$id_estacao_Tipo} not Found", 404);
+    }       
+    
+    $response->getBody()->write(json_encode($estacao_Tipo,  256));
+    return $response->withHeader('Content-type', 'application/json')
+            ->withStatus(200);
+
+});
+
+
 /**
  * HTTP Auth - Autenticação minimalista para retornar um JWT
  */
@@ -128,15 +227,52 @@ $app->get('/auth', function (Request $request, Response $response) use ($app) {
     
 });
 
-/*
-/*Working with POST Data
-$app->post('/ticket/new', function (Request $request, Response $response) {
-    $data = $request->getParsedBody();
-    $ticket_data = [];
-    $ticket_data['title'] = filter_var($data['title'], FILTER_SANITIZE_STRING);
-    $ticket_data['description'] = filter_var($data['description'], FILTER_SANITIZE_STRING);
-    // ...
-*/
+$app->post('/estacao_melhoria', function (Request $request, Response $response) use ($app) {
+    $params = (object) $request->getParsedBody();
+    $entityManager = $this->get('em');
+    $repository = $entityManager->getRepository('App\Models\Entity\Estacao_melhoria_estacao');
+    $estacaoMelhoriaEstacao = $repository->findOneBy(
+            array('id_estacao' => $params->id_estacao, 
+                'id_estacao_melhoria' => $params->id_estacao_melhoria)
+            );
+    
+    if (!$estacaoMelhoriaEstacao) {
+        $estacaoMelhoriaEstacao = new Estacao_melhoria_estacao();
+        $estacaoMelhoriaEstacao->quantidade = 1;
+        $estacaoMelhoriaEstacao->id_estacao = $params->id_estacao;
+        $estacaoMelhoriaEstacao->id_estacao_melhoria = $params->id_estacao_melhoria;
+        $repository = $entityManager->getRepository('App\Models\Entity\Estacao_melhoria');
+        $estacao_melhoria = $repository->find($params->id_estacao_melhoria);
+        $estacaoMelhoriaEstacao->estacao_melhoria = $estacao_melhoria;
+        /**
+        * Persiste a entidade no banco de dados
+        */
+       $entityManager->persist($estacaoMelhoriaEstacao);
+       $entityManager->flush();
+    }else{
+        $estacaoMelhoriaEstacao->quantidade += 1;
+        $entityManager->flush();
+    }
+
+    $repository = $entityManager->getRepository('App\Models\Entity\Tribo');
+    $tribo = $repository->find($params->id_tribo);
+    
+    $repository = $entityManager->getRepository('App\Models\Entity\Estacao');
+    $tribo->estacoes = $repository->findBy(array('id_tribo' => $tribo->id_tribo));
+    
+    
+    /**
+     * Verifica se existe a tribo com a ID informada
+     */
+    if (!$tribo) {
+        $logger = $this->get('logger');
+        $logger->warning("Tribo {$params->id_tribo} Not Found");
+        throw new \Exception("Tribo not Found", 404);
+    }       
+    $return = $response->withJson($tribo, 200)
+        ->withHeader('Content-type', 'application/json');
+    return $return;       
+});
 
 $app->run();
 

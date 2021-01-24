@@ -3,46 +3,34 @@
 namespace App\Models\Entity;
 
 /**
- * @Entity @Table(name="tribo")
+ * @Entity @Table(name="estacao")
  **/
-class Tribo{
+class Estacao{
     
     /**
      * @var int
      * @Id @Column(type="integer")
      * @GeneratedValue
      **/
-    public $id_tribo;
+    public $id_estacao;
     
     /**
      * @var int
      * @Column(type="integer")
      **/
-    public $reputacao;
+    public $producao;
+    
+    /**
+     * @var int
+     * @Column(type="integer")
+     **/
+    public $consumo;
     
     /**
      * @var int
      * @Column(type="integer")
      **/
     public $nivel;
-    
-    /**
-     * @var int
-     * @Column(type="integer")
-     **/
-    public $nivel_sustentavel;
-    
-    /**
-     * @var int
-     * @Column(type="integer")
-     **/
-    public $nivel_sabedoria;
-    
-    /**
-     * @var int
-     * @Column(type="integer")
-     **/
-    public $id_jogador;
     
     /**
      * @var int
@@ -60,18 +48,20 @@ class Tribo{
      * @var int
      * @Column(type="integer")
      **/
-    public $moedas;
+    public $id_tribo;
     
-    /** 
-    *  
-    * @OneToMany(targetEntity="Estacao", mappedBy="Tribo", cascade={"persist", "remove"}) 
-    */
-    public $estacoes;
-
+    /**
+     * @var int
+     * @Column(type="integer")
+     **/
+    public $id_estacao_tipo;
+    
+    
+    public $estacao_tipo;
+    
     public function __construct(){
-        $this->estacoes = new ArrayCollection();
+        $this->estacao_tipo = new Estacao_tipo();
     }
-   
 }
 
 

@@ -23,20 +23,23 @@ $app = new \Slim\App(['settings' => $config]);
 /**
  * Diretório de Entidades e Metadata do Doctrine
  */
+//ifb
+//
 $config = Setup::createAnnotationMetadataConfiguration(array("C:/Apache24/htdocs/SlimOGS/src/Models/Entity"), $isDevMode);
+//Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
 
 $dbParams = array(
     'driver'   => 'pdo_mysql',
     'user'     => 'root',
     'password' => 'abc123',
-    'dbname'   => 'ogs',
+    //'password' => 'Abc@2323',
+    'dbname'   => 'OGS',
 );
 
 /**
  * Cria o container para aplicação
  */
 $container = $app->getContainer();
-
 
 /**
  * Instância do Entity Manager
@@ -56,6 +59,7 @@ $app->add(new TrailingSlash(false));
 $container['logger'] = function($container) {
     $logger = new Monolog\Logger('OGS-microservice');
     $logfile = 'C:/Apache24/htdocs/SlimOGS/logs/OGS-microservice.log';
+    //    $logfile = '/var/www/SlimOGS/logs/OGS-microservice.log';
     $stream = new Monolog\Handler\StreamHandler($logfile, Monolog\Logger::DEBUG);
     $fingersCrossed = new Monolog\Handler\FingersCrossedHandler(
         $stream, Monolog\Logger::INFO);
@@ -71,7 +75,7 @@ $container['errorHandler'] = function ($container) {
         $statusCode = $exception->getCode() ? $exception->getCode() : 500;
         return $container['response']->withStatus($statusCode)
             ->withHeader('Content-Type', 'Application/json')
-            ->withJson(["message" => $exception->getMessage()], $statusCode);
+            ->withJson(["message" => $exception->getMessage(), "codErro" => $statusCode], $statusCode);
     };
 };
 
