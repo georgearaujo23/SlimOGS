@@ -9,6 +9,15 @@ CREATE TABLE jogador(
     senha varchar(100) NOT NULL
 );
 
+CREATE TABLE Token_jogador(
+	id_token INT PRIMARY KEY AUTO_INCREMENT,
+    token varchar(1000) NOT NULL,
+    refresh_token varchar(1000) NOT NULL,
+    validade datetime NOT NULL UNIQUE,
+    id_jogador int NOT NULL,
+    CONSTRAINT FK_token_jogador FOREIGN KEY (id_jogador) REFERENCES jogador(id_jogador)
+);
+
 CREATE TABLE aluno(
 	id_aluno INT PRIMARY KEY AUTO_INCREMENT,
     matricula VARCHAR(20) NOT NULL,

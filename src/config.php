@@ -1,16 +1,8 @@
 <?php
 require '../vendor/autoload.php';
-require '../classes/RandomAuthenticator.php';
 use Psr7Middlewares\Middleware\TrailingSlash;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
-use Firebase\JWT\JWT;
-use Slim\Slim;
-use Slim\Middleware\SessionCookie;
-use App\Auth\Auth;
-use Tuupola\Middleware\HttpBasicAuthentication\AuthenticatorInterface;
-use App\Models\Entity\Jogador;
-
 $isDevMode = true;
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
@@ -82,30 +74,7 @@ $container['errorHandler'] = function ($container) {
 /**
  * Token do nosso JWT
  */
-$container['secretkey'] = "secretloko";
-
-/*
-/**
- * Cria rota de autenticação
- */
-$app->add(new Tuupola\Middleware\HttpBasicAuthentication([
-    
-    "path" => "/auth",
-    "realm" => "Protected",
-    "secure" => true,
-    "authenticator" => new RandomAuthenticator($container['em'], $container['logger']),
-    "error" => function ($response, $arguments) {
-        $data = [];
-        $data["status"] = "error";
-        $data["message"] = $arguments["message"];
-
-        $body = $response->getBody();
-        $body->write(json_encode($data, JSON_UNESCAPED_SLASHES));
-
-        return $response->withBody($body);
-    }
-]));
-
+$container['secretkey'] = "secreOGSToCreateToken";
 
 /**
  * Auth básica do JWT
@@ -118,5 +87,6 @@ $app->add(new Tuupola\Middleware\JwtAuthentication([
     "path" => "/", //Vamos cobrir toda a API a partir do /
     "ignore" => "/auth",
     "realm" => "Protected", 
+    "logger" => $container['logger'],
     "secret" => $container['secretkey']
 ]));
