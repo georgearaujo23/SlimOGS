@@ -3,7 +3,7 @@ namespace src;
 
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
-
+use App\DQL\NumericFunction;
 
 putenv('JWT_SECRET_KEY=secreOGSToCreateToken');
 
@@ -15,17 +15,19 @@ function slimConfiguration(): \Slim\Container
         'user'     => 'root',
         'password' => 'abc123',
         //'password' => 'Abc@2323',
-        'dbname'   => 'OGS',
+        'dbname'   => 'ogs',
     );
     
     /**
     * Diretório de Entidades e Metadata do Doctrine
     */
     //ifb
-    //
+    //$config = Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
+    //Local
     $config = Setup::createAnnotationMetadataConfiguration(array("C:/Apache24/htdocs/SlimOGS/src/Models/Entity"), $isDevMode);
     //Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
    
+    $config->addCustomNumericFunction('RAND', 'App\Models\Functions\Rand');
     
     $configuration = [
         'settings' => [

@@ -22,16 +22,16 @@ final class EstacaoMelhoriaController {
        $this->logger = $container['logger'];
    }
     
-    public function consultarEstacaomelhoriaPorTipoNivel(Request $request, Response $response, array $args) : Response{
+    public function consultarEstacaomelhoriaPorSabedoria(Request $request, Response $response, array $args) : Response{
         $params = (object) $request->getQueryParams();
         $id_estacao_tipo = $params->id_estacao_tipo;
-        $nivel = $params->nivel;
+        $sabedoria = $params->sabedoria;
 
         $query = $this->entityManager->createQuery('SELECT u FROM App\Models\Entity\Estacao_melhoria u '
                 . 'WHERE u.id_estacao_tipo = ?1'
-                . 'AND u.nivel <= ?2');
+                . 'AND u.sabedoria <= ?2');
         $query->setParameter(1, $id_estacao_tipo);
-        $query->setParameter(2, $nivel);
+        $query->setParameter(2, $sabedoria);
         $estacao_melhoria = $query->getResult(); 
 
         if (!$estacao_melhoria) {

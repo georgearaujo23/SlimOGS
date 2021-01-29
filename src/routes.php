@@ -1,26 +1,24 @@
 <?php
-use Doctrine\ORM\Tools\Setup;
-use Doctrine\ORM\EntityManager;
 use Psr7Middlewares\Middleware\TrailingSlash;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use Tuupola\Middleware\JwtAuthentication;
 
 use function src\{
     slimConfiguration,
     jwtAuth
 };
 use App\Models\Entity\ {
-    Questao, 
-    Questao_alternativa, 
-    Estacao_melhoria_estacao, 
-    Jogador
+    Questao_alternativa
 };
 use App\Controllers\ {
     AuthController,
     TriboController,
     EstacaoMelhoriaController,
-    EstacaoMelhoriaEstacaoController
+    EstacaoMelhoriaEstacaoController,
+    JogadorController,
+    DesafioController,
+    QuestaoController,
+    DesafioJogadorController
 };
 
 use App\Middlewares\ {
@@ -36,8 +34,10 @@ $container = $app->getContainer();
 */
 $container['logger'] = function($container) {
     $logger = new Monolog\Logger('OGS-microservice');
+    //local
     $logfile = 'C:/Apache24/htdocs/SlimOGS/logs/OGS-microservice.log';
-    //    $logfile = '/var/www/SlimOGS/logs/OGS-microservice.log';
+    //IF
+    //$logfile = '/var/www/SlimOGS/logs/OGS-microservice.log';
     $stream = new Monolog\Handler\StreamHandler($logfile, Monolog\Logger::DEBUG);
     $fingersCrossed = new Monolog\Handler\FingersCrossedHandler(
         $stream, Monolog\Logger::INFO);
@@ -60,27 +60,17 @@ $app->post('/auth' , AuthController::class . ':login') ;
 $app->post('/refresh-token' , AuthController::class . ':refreshToken')
         ->add(jwtAuth());
 
-$app->get('/teste' , function(){echo getenv('JWT_SECRET_KEY');})
-    ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
+$app->get('/teste' , function(){
+    $dateInLocal = date("Y-m-d H:i:s");
+    var_dump($time);
+    var_dump(date("Y-m-d H:i:s"));
+});
 
 /**Routes GEY*/
-$app->get('/questao/{id_questao}', function (Request $request, Response $response, array $args) {
-  
-    $id_questao = $args['id_questao'];
-    $entityManager = $this->get('em');
-    
-    $repository = $entityManager->getRepository('App\Models\Entity\Questao');
-    $questao = $repository->find($id_questao);
-    
-    $repositoryAlternativas = $entityManager->getRepository('App\Models\Entity\Questao_alternativa');
-    $alternativas = $repositoryAlternativas->findBy(array('id_questao' => $id_questao));
-    $questao->setAlternativas($alternativas);
-    
-    $response->getBody()->write(json_encode($questao,  256));
-    return $response->withHeader('Content-type', 'application/json')
-            ->withStatus(200);
+$app->get('/questao/{id_questao}', QuestaoController::class . ':consultarQuestaoPorId')
+->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
-})
+$app->get('/questoesNovoDesafio', QuestaoController::class . ':consultarQuestaoParaDesafio')
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
 $app->get('/questao_alternativa/{id_questao_alternativa}', function (Request $request, Response $response, array $args) {
@@ -135,29 +125,25 @@ $app->get('/frequencia/{id_frequecia}', function (Request $request, Response $re
 })
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
-$app->get('/jogador/{id_jogador}', function (Request $request, Response $response, array $args) {
-    $id_jogador = $args['id_jogador'];
-    $entityManager = $this->get('em');
-    $repository = $entityManager->getRepository('App\Models\Entity\Jogador');
-    $jogador = $repository->find($id_jogador);
-    
-    $response->getBody()->write(json_encode($jogador,  256));
-    return $response->withHeader('Content-type', 'application/json')
-            ->withStatus(200);
+$app->get('/jogador/{id_jogador}', JogadorController::class . ':consultarJogadorPorId')
+->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
-})
+$app->get('/desafios/{id_jogador}', DesafioController::class . ':consultarDesafios')
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
 $app->get('/tribo/{id_tribo}', TriboController::class . ':triboPorId')
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
-$app->get('/triboPorEmail/{email}', TriboController::class . ':triboPorUsuario')
+$app->get('/triboPorUsuario/{usuario}', TriboController::class . ':triboPorUsuario')
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
-$app->get('/estacaomelhoriaPorTipoNivel', EstacaoMelhoriaController::class . ':consultarEstacaomelhoriaPorTipoNivel')
+$app->get('/estacaomelhoriaPorSabedoria', EstacaoMelhoriaController::class . ':consultarEstacaomelhoriaPorSabedoria')
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
 $app->get('/estacaoMelhoriaEstacaoPorEstacao', EstacaoMelhoriaEstacaoController::class . ':consultarEstacaomelhoriaEstacaoPorEstacao' )
+->add(new JwtDateTimeMiddleware())->add(jwtAuth());
+
+$app->get('/estacaoMelhoriaEmConstrucao', EstacaoMelhoriaEstacaoController::class . ':consultarEstacaoMelhoriaEmConstrucao' )
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
 $app->get('/estacaoTipo/{id_estacao_Tipo}', function (Request $request, Response $response, array $args) {
@@ -184,6 +170,11 @@ $app->get('/estacaoTipo/{id_estacao_Tipo}', function (Request $request, Response
 $app->post('/estacao_melhoria', EstacaoMelhoriaEstacaoController::class . ':inserirEstacaomelhoriaEstacao' )
 ->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
+$app->post('/estacaoMelhoriaEstacaoConstrucao', EstacaoMelhoriaEstacaoController::class . ':atualizarEstacaoMelhoriaEstacaoConstrucao' )
+->add(new JwtDateTimeMiddleware())->add(jwtAuth());
+
+$app->post('/desafioJogador', DesafioJogadorController::class . ':incluirDesafioJogador')
+->add(new JwtDateTimeMiddleware())->add(jwtAuth());
 
 $app->run();
 

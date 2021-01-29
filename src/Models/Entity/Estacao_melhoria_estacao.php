@@ -32,6 +32,31 @@ class Estacao_melhoria_estacao {
      */
     public $id_estacao_melhoria;
     
+     /**
+     * @var boolean
+     * @Column(type="boolean")
+     **/
+    public $estaConstruindo;
+    
+     /**
+     * @var string
+     * @Column(type="string")
+     **/
+    public $inicioConstrucao;
+    
+     /**
+     * @var string
+     * @Column(type="string")
+     **/
+    public $fimConstrucao;
+    
+    
+     /**
+     * @var string
+     * @Column(type="string")
+     **/
+    public $horaServidor;
+    
     /**
      * @ManyToOne(targetEntity="Estacao_melhoria")
      * @JoinColumn(name="id_estacao_melhoria", referencedColumnName="id_estacao_melhoria")

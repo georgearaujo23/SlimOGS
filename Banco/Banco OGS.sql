@@ -9,11 +9,11 @@ CREATE TABLE jogador(
     senha varchar(100) NOT NULL
 );
 
-CREATE TABLE Token_jogador(
+CREATE TABLE token_jogador(
 	id_token INT PRIMARY KEY AUTO_INCREMENT,
     token varchar(1000) NOT NULL,
     refresh_token varchar(1000) NOT NULL,
-    validade datetime NOT NULL UNIQUE,
+    validade datetime NOT NULL,
     id_jogador int NOT NULL,
     CONSTRAINT FK_token_jogador FOREIGN KEY (id_jogador) REFERENCES jogador(id_jogador)
 );
@@ -143,6 +143,10 @@ CREATE TABLE estacao_melhoria_estacao(
     quantidade INT NOT NULL,
     id_estacao INT NOT NULL,
     id_estacao_melhoria INT NOT NULL,
+    estaConstruindo boolean NOT NULL DEFAULT 0,
+    inicioConstrucao datetime,
+    finConstrucao datetime,
+    horaServidor datetime default current_timestamp,
     CONSTRAINT FK_ESTACAO_melhoria_est FOREIGN KEY (id_estacao) REFERENCES estacao(id_estacao),
     CONSTRAINT FK_ESTACAO_est_melhoria FOREIGN KEY (id_estacao_melhoria) REFERENCES estacao_melhoria(id_estacao_melhoria)
 );
@@ -163,6 +167,30 @@ CREATE TABLE alianca_tribo(
     CONSTRAINT FK_alianca_tribo_tribo FOREIGN KEY (id_tribo) REFERENCES tribo(id_tribo),
     CONSTRAINT FK_alianca_tribo_alianca FOREIGN KEY (id_alianca) REFERENCES alianca(id_alianca)
 );
+
+DROP TRIGGER ogs.EME_INSERT_construcao;
+DELIMITER //
+CREATE DEFINER = CURRENT_USER TRIGGER ogs.EME_INSERT_construcao
+BEFORE INSERT  ON ogs.estacao_melhoria_estacao
+FOR EACH ROW
+BEGIN
+	SET NEW.inicioConstrucao = utc_timestamp;
+    SET NEW.fimConstrucao = DATE_ADD(utc_timestamp, INTERVAL 10 MINUTE);
+END//
+DELIMITER ;
+
+DROP TRIGGER ogs.EME_UPDATE_construcao;
+DELIMITER //
+CREATE DEFINER = CURRENT_USER TRIGGER ogs.EME_UPDATE_construcao
+BEFORE UPDATE  ON ogs.estacao_melhoria_estacao
+FOR EACH ROW
+BEGIN
+	IF(NEW.estaConstruindo = 1 AND OLD.estaConstruindo = 0) THEN
+		SET NEW.inicioConstrucao = utc_timestamp;
+		SET NEW.fimConstrucao = DATE_ADD(utc_timestamp, INTERVAL 10 MINUTE);
+    END IF;
+END//
+DELIMITER ;
 
 DROP TRIGGER ogs.EME_INSERT_atualizarEstacaoXP;
 DELIMITER //

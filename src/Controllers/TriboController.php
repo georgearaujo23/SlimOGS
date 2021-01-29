@@ -43,10 +43,10 @@ final class TriboController {
     }
 
     public function triboPorUsuario(Request $request, Response $response, array $args) : Response{
-        $email = $args['email'];
+        $usuario = strtolower($args['usuario']);
         
         $repository = $this->entityManager->getRepository('App\Models\Entity\Jogador');
-        $jogador = $repository->findOneBy(array('email' => $email));
+        $jogador = $repository->findOneBy(array('nick_name' => $usuario));
         $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
         $tribo = $repository->findOneBy(array('id_jogador' => $jogador->id_jogador));
         /**
@@ -54,7 +54,7 @@ final class TriboController {
          */
         if (!$tribo) {
             $this->logger->warning("Tribo {$id_tribo} Not Found");
-            throw new \Exception("Tribo not Found {$jogador->id_jogador}", 404);
+            throw new \Exception("Tribo not Found para o jogador{$jogador->id_jogador}", 404);
         }       
 
         $repository = $this->entityManager->getRepository('App\Models\Entity\Estacao');

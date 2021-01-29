@@ -28,19 +28,19 @@ final class AuthController {
         if(!empty($params->password) && !empty($params->user)){
              
             $Password = $params->password;
-            $email = $params->user;
+            $usuario = strtolower($params->user);
             $repository = $entityManager->getRepository('App\Models\Entity\Jogador');
-            $jogador = $repository->findOneBy(array('email' => $email));
+            $jogador = $repository->findOneBy(array('nick_name' => $usuario));
             
             if(!is_null($jogador)){
                 if (!$jogador->login($Password)) {
-                    $logger->error("Login {$email} senha incorreta");
+                    $logger->error("Login {$usuario} senha incorreta");
                     throw new \Exception("Senha incorreta", 412);
                     die;
                 }
             }else{
-                $logger->error("Login {$email} email não encontrado");
-                throw new \Exception("Nenhum usuario encontrado para o email informado", 412);
+                $logger->error("Login {$usuario} usuário não encontrado");
+                throw new \Exception("Nenhum usuario informado não existe", 412);
                 die;
             }
             

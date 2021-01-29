@@ -63,5 +63,3 @@ class Estacao{
         $this->estacao_tipo = new Estacao_tipo();
     }
 }
-
-
