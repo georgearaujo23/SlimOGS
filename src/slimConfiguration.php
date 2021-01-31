@@ -25,7 +25,6 @@ function slimConfiguration(): \Slim\Container
     //$config = Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
     //Local
     $config = Setup::createAnnotationMetadataConfiguration(array("C:/Apache24/htdocs/SlimOGS/src/Models/Entity"), $isDevMode);
-    //Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
    
     $config->addCustomNumericFunction('RAND', 'App\Models\Functions\Rand');
     

@@ -29,12 +29,17 @@ class Desafio_jogador{
      * @var int
      * @Column(type="integer")
      */
+    public $quantidade_respondida;
+    
+    /**
+     * @var int
+     * @Column(type="integer")
+     */
     public $quantidade_acertos;
     
     /**
-     * @var string
-     * @Column(type="string")
+     * @var boolean
+     * @Column(type="boolean")
      */
-    public $data_resposta;
-    
+    public $terminou;
 }

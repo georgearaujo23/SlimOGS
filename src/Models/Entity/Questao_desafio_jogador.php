@@ -31,4 +31,10 @@ class Questao_desafio_jogador{
      */
     public $id_questao_alternativa;
     
+    /**
+     * @var string
+     * @Column(type="string")
+     */
+    public $data_resposta;
+    
 }

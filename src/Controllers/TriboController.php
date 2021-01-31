@@ -8,7 +8,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use App\Models\Entity\ {
     Tribo,
     Jogador,
-    Estacao
+    Estacao,
+    Desafio
 };
 
 final class TriboController {
@@ -24,7 +25,17 @@ final class TriboController {
        $this->logger = $container['logger'];
    }
     
-    public function triboPorId(Request $request, Response $response, array $args) : Response{
+   public function atualizarTriboDesafio($id_tribo, Desafio $desafio){
+        $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
+        $tribo = $repository->find($id_tribo);
+        
+        $tribo->moedas += $desafio->moedas;
+        $tribo->nivel_sabedoria += $desafio->sabedoria;
+        $tribo->experiencia += $desafio->xp;
+        $this->entityManager->flush();     
+   }
+
+   public function consultarTriboPorId(Request $request, Response $response, array $args) : Response{
         $id_tribo = $args['id_tribo'];
         $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
         $tribo = $repository->find($id_tribo);
@@ -42,8 +53,8 @@ final class TriboController {
 
     }
 
-    public function triboPorUsuario(Request $request, Response $response, array $args) : Response{
-        $usuario = strtolower($args['usuario']);
+    public function consultarTriboPorUsuario(Request $request, Response $response, array $args) : Response{
+        $usuario = strtolower($args['nick_name']);
         
         $repository = $this->entityManager->getRepository('App\Models\Entity\Jogador');
         $jogador = $repository->findOneBy(array('nick_name' => $usuario));

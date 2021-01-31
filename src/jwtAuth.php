@@ -1,11 +1,9 @@
 <?php
-
 namespace src;
 
 use Tuupola\Middleware\JwtAuthentication;
-use App\Middlewares\ {
-    JwtDateTimneMiddleware
-};
+use App\Middlewares\JwtDateTimneMiddleware;
+
 /**
  * Auth básica do JWT
  * Whitelist - Bloqueia tudo, e só libera os
