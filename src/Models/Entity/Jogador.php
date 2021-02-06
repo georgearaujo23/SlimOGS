@@ -20,8 +20,8 @@ class Jogador{
     public $nick_name;
     
     /**
-     * @var DateTime
-     * @Column(type="date")
+     * @var string
+     * @Column(type="string")
      */
     public $registro;
     

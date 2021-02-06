@@ -32,11 +32,12 @@ final class QuestaoDesafioJogadorController {
         $this->entityManager->flush();
 
         $desafioJogadorController = new DesafioJogadorController($this->container);
-        $desafioJogadorController->AtualizarDesafioJogador($params->id_desafio_jogador, $params->acertou, $params->terminou);
+        $desafioJogador = $desafioJogadorController->AtualizarDesafioJogador($params->id_desafio_jogador, $params->acertou, $params->terminou);
         $triboController = new TriboController($this->container);
         $desafioController = new DesafioController($this->container);
-        if($params->terminou){
-            $triboController->atualizarTriboDesafio($params->id_tribo, $desafioController->consultarDesafioPorId($params->id_desafio));
+        $desafio = $desafioController->consultarDesafioPorId($params->id_desafio);
+        if($params->terminou && $desafioJogador->quantidade_acertos > $desafio->quantidade_acertos){
+            $triboController->atualizarTriboDesafio($params->id_tribo, $desafio);
         }
         return $triboController->consultarTriboPorUsuario($request, $response, array('nick_name' => $params->nick_name));       
     }

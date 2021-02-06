@@ -22,7 +22,7 @@ final class AuthController {
     private function geraRefreshToken($nick_name) : string{
         $refreshTokenPayload = [
             'nick_name' => $nick_name,
-            'random' => uniqid()
+            'rambom' => uniqid()
         ];
         return JWT::encode($refreshTokenPayload, $this->container['secretkey']);
     }
@@ -43,34 +43,34 @@ final class AuthController {
     public function login(Request $request, Response $response) : Response{
         $params = (object) $request->getParsedBody();
         
-        if(!empty($params->password) && !empty($params->user)){
-            $Password = $params->password;
-            $usuario = strtolower($params->user);
-            $repository = $this->entityManager->getRepository('App\Models\Entity\Jogador');
-            $jogador = $repository->findOneBy(array('nick_name' => $usuario));
+        if(!empty($params->senha) && !empty($params->email)){
+            $senha = $params->senha;
+            $email = strtolower($params->email);
+            $repository = $this->entityManager->getRepository('App\Models\Entity\Professor');
+            $professor = $repository->findOneBy(array('email' => $email));
             
-            if(!$jogador){
-                $this->logger->error("Login {$usuario} usuário não encontrado");
-                throw new \Exception('Usuario informado nao existe', 412);
+            if(!$professor){
+                $this->logger->error("Login {$email} professor não encontrado");
+                throw new \Exception('Professor informado nao existe', 412);
                 die;
             }else{
-                if (!$jogador->login($Password)) {
-                    $this->logger->error("Login {$usuario} senha incorreta");
+                if (!$professor->login($senha)) {
+                    $this->logger->error("Login {$email} senha incorreta");
                     throw new \Exception("Senha incorreta", 412);
                     die;
                 }
             }
             
         }else{
-            $this->logger->error("Login sem usuario ou senha");
-            throw new \Exception("Informe usuario e senha", 412);
+            $this->logger->error("Login sem email ou senha");
+            throw new \Exception("Informe email e senha", 412);
             die;
         }
         
         $validade = new \DateTime();
         date_time_set( $validade , 23 , 59 , 59 );
-        $token = $this->geraToken($jogador->id_jogador, $validade);
-        $refreshToken = $this->geraRefreshToken($jogador->nick_name);
+        $token = $this->geraToken($professor->id_professor, $validade);
+        $refreshToken = $this->geraRefreshToken($professor->email);
         
         $tokenJogadorControler = new TokenJogadorController( $this->container);
         $tokenJogadorControler->inserirTokenJogador($token, $refreshToken, $validade,  $jogador->id_jogador);

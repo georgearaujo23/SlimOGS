@@ -36,7 +36,13 @@ class Tribo{
      * @var int
      * @Column(type="integer")
      **/
-    public $nivel_sabedoria;
+    public $sabedoria;
+    
+    /**
+     * @var int
+     * @Column(type="integer")
+     **/
+    public $sabedoria_saldo;
     
     /**
      * @var int
@@ -67,6 +73,12 @@ class Tribo{
     * @OneToMany(targetEntity="Estacao", mappedBy="Tribo", cascade={"persist", "remove"}) 
     */
     public $estacoes;
+    
+    /**
+     * @ManyToOne(targetEntity="Jogador")
+     * @JoinColumn(name="id_jogador", referencedColumnName="id_jogador")
+     */
+    public $jogador;
 
     public function __construct(){
         $this->estacoes = new ArrayCollection();

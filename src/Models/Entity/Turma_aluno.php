@@ -36,5 +36,17 @@ class Turma_aluno{
      */
     public $frequencias;
     
+    /**
+     * @OneToOne(targetEntity="Aluno", mappedBy="Turma_aluno", cascade={"persist", "remove"})
+     * @JoinColumn(name="id_aluno", referencedColumnName="id_aluno")
+     */
+    public $aluno;
+    
+    /**
+     * @OneToOne(targetEntity="Turma", mappedBy="Turma_aluno", cascade={"persist", "remove"})
+     * @JoinColumn(name="id_turma", referencedColumnName="id_turma")
+     */
+    public $turma;
+
 }
 

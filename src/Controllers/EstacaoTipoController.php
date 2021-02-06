@@ -23,7 +23,6 @@ final class EstacaoTipoController {
         $estacao_Tipo = $repository->find($id_estacao_Tipo);
         
         if (!$estacao_Tipo) {
-            $this->logger = $this->get('logger');
             $this->logger->warning("EstacaoTipo {$id_estacao_Tipo} Not Found");
             throw new \Exception("EstacaoTipo {$id_estacao_Tipo} not Found", 404);
         }       

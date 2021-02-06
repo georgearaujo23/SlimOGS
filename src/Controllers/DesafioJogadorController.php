@@ -28,7 +28,8 @@ final class DesafioJogadorController {
         $desafioJogador->terminou = $terminou;
         $desafioJogador->quantidade_respondida = $desafioJogador->quantidade_respondida + 1;
         $desafioJogador->quantidade_acertos = $desafioJogador->quantidade_acertos + $acertou;
-        $this->entityManager->flush();     
+        $this->entityManager->flush();  
+        return $desafioJogador;
     }
     
     public function inserirDesafioJogador(Request $request, Response $response) : Response{

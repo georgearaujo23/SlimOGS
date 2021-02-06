@@ -26,8 +26,21 @@ class Professor{
     public $email;
     
     /**
+     * @var string
+     * @Column(type="string")
+     */
+    public $senha;
+    
+    /**
      * @OneToMany(targetEntity="Turma", mappedBy="Professor", cascade={"persist", "remove"}) 
      */
     public $turmas;
+    
+    public function login ($passWord){
+        if($this->senha === $passWord){
+            return true;
+        }
+        return false;
+    }
 }
 

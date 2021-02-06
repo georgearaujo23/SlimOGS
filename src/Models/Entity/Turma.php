@@ -25,10 +25,5 @@ class Turma{
      */
     public $id_professor;
     
-    /**
-     * @OneToMany(targetEntity="Turma_aluno", mappedBy="Turma", cascade={"persist", "remove"}) 
-     */
-    public $turmas;
-    
 }
 

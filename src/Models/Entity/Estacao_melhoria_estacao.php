@@ -36,26 +36,19 @@ class Estacao_melhoria_estacao {
      * @var boolean
      * @Column(type="boolean")
      **/
-    public $estaConstruindo;
+    public $esta_construindo;
     
      /**
      * @var string
      * @Column(type="string")
      **/
-    public $inicioConstrucao;
+    public $inicio_construcao;
     
      /**
      * @var string
      * @Column(type="string")
      **/
-    public $fimConstrucao;
-    
-    
-     /**
-     * @var string
-     * @Column(type="string")
-     **/
-    public $horaServidor;
+    public $fim_construcao;
     
     /**
      * @ManyToOne(targetEntity="Estacao_melhoria")

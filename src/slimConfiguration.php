@@ -44,9 +44,10 @@ function slimConfiguration(): \Slim\Container
     $container['errorHandler'] = function ($container) {
        return function ($request, $response, $exception) use ($container) {
            $statusCode = $exception->getCode() ? $exception->getCode() : 500;
+           $message = $exception->getMessage() ? $exception->getMessage() : "Erro Interno do servidor";
            return $container['response']->withStatus($statusCode)
                ->withHeader('Content-Type', 'Application/json')
-               ->withJson(["message" => $exception->getMessage(), "codErro" => $statusCode], $statusCode);
+               ->withJson(["message" => $message, "codErro" => $statusCode], $statusCode);
        };
    };
     

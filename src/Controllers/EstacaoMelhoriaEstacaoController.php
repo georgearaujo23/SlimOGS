@@ -26,9 +26,17 @@ final class EstacaoMelhoriaEstacaoController {
         );
 
         if ($estacaoMelhoriaEstacao) {
-            if(date("Y-m-d H:i:s") >= $estacaoMelhoriaEstacao->fimConstrucao){
-                $estacaoMelhoriaEstacao->estaConstruindo = 0;
+            if(date("Y-m-d H:i:s") >= $estacaoMelhoriaEstacao->fim_construcao){
+                $estacaoMelhoriaEstacao->esta_construindo = 0;
                 $estacaoMelhoriaEstacao->quantidade += 1;
+                $repository = $this->entityManager->getRepository('App\Models\Entity\Estacao_melhoria');
+                $estacaoMelhoria = $repository->find($estacaoMelhoriaEstacao->id_estacao_melhoria);
+                if(!is_null($estacaoMelhoria->id_estacao_melhoria_relacionada)){
+                    $estacaoMelhoria->pesquisado = false;
+                    $this->entityManager->flush();
+                    $estacaoMelhoria = $repository->find($estacaoMelhoria->id_estacao_melhoria_relacionada);
+                    $estacaoMelhoria->pesquisado = true;
+                }
                 $this->entityManager->flush();
             }
         }
@@ -43,7 +51,8 @@ final class EstacaoMelhoriaEstacaoController {
 
         $query = $this->entityManager->createQuery('SELECT u, e FROM App\Models\Entity\Estacao_melhoria_estacao u '
                 . 'JOIN u.estacao_melhoria e '
-                . 'WHERE u.estaConstruindo = 1 AND u.id_estacao = ?1');
+                . 'WHERE u.esta_construindo = 1 '
+                . 'AND u.id_estacao = ?1');
         $query->setParameter(1, $id_estacao);
         $estacao_melhoria_estacao = $query->getResult(); 
 
@@ -95,15 +104,14 @@ final class EstacaoMelhoriaEstacaoController {
             $estacaoMelhoriaEstacao->id_estacao = $params->id_estacao;
             $estacaoMelhoriaEstacao->id_estacao_melhoria = $params->id_estacao_melhoria;
             $estacaoMelhoriaEstacao->quantidade = 0;
-            $estacaoMelhoriaEstacao->estaConstruindo = true;
+            $estacaoMelhoriaEstacao->esta_construindo = true;
             $repository = $this->entityManager->getRepository('App\Models\Entity\Estacao_melhoria');
             $estacao_melhoria = $repository->find($params->id_estacao_melhoria);
             $estacaoMelhoriaEstacao->estacao_melhoria = $estacao_melhoria;
             $this->entityManager->persist($estacaoMelhoriaEstacao);
             $this->entityManager->flush();
         }else{
-            $estacaoMelhoriaEstacao->quantidade += 1;
-            $estacaoMelhoriaEstacao->estaConstruindo = true;
+            $estacaoMelhoriaEstacao->esta_construindo = true;
             $this->entityManager->flush();
         }
         $triboController = new TriboController($this->container);

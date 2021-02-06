@@ -20,13 +20,11 @@ final class EstacaoMelhoriaController {
     public function consultarEstacaomelhoriaPorSabedoria(Request $request, Response $response, array $args) : Response{
         $params = (object) $request->getQueryParams();
         $id_estacao_tipo = $params->id_estacao_tipo;
-        $sabedoria = $params->sabedoria;
 
         $query = $this->entityManager->createQuery('SELECT u FROM App\Models\Entity\Estacao_melhoria u '
                 . 'WHERE u.id_estacao_tipo = ?1'
-                . 'AND u.sabedoria <= ?2');
+                . 'AND u.pesquisado = 1');
         $query->setParameter(1, $id_estacao_tipo);
-        $query->setParameter(2, $sabedoria);
         $estacao_melhoria = $query->getResult(); 
 
         if (!$estacao_melhoria) {

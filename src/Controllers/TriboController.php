@@ -30,7 +30,7 @@ final class TriboController {
         $tribo = $repository->find($id_tribo);
         
         $tribo->moedas += $desafio->moedas;
-        $tribo->nivel_sabedoria += $desafio->sabedoria;
+        $tribo->sabedoria += $desafio->sabedoria;
         $tribo->experiencia += $desafio->xp;
         $this->entityManager->flush();     
    }
@@ -60,11 +60,9 @@ final class TriboController {
         $jogador = $repository->findOneBy(array('nick_name' => $usuario));
         $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
         $tribo = $repository->findOneBy(array('id_jogador' => $jogador->id_jogador));
-        /**
-         * Verifica se existe a tribo com a ID informada
-         */
+
         if (!$tribo) {
-            $this->logger->warning("Tribo {$id_tribo} Not Found");
+            $this->logger->warning("Tribo {$usuario} Not Found");
             throw new \Exception("Tribo not Found para o jogador{$jogador->id_jogador}", 404);
         }       
 

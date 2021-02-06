@@ -68,17 +68,30 @@ class Estacao_melhoria {
      * @Column(type="integer") 
      */
     public $sabedoria;
+    
     /**
      * @var int
      * @Column(type="integer") 
      */
-    public $nivel;
+    public $sabedoria_pesquisa;
+    
+    /**
+     * @var boolean
+     * @Column(type="boolean") 
+     */
+    public $pesquisado;
     
     /**
      * @var int
      * @Column(type="integer") 
      */
     public $id_estacao_tipo;
+    
+    /**
+     * @var int
+     * @Column(type="integer") 
+     */
+    public $id_estacao_melhoria_relacionada;
     
     public $estacao_tipo;
     
