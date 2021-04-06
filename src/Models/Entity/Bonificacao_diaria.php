@@ -3,33 +3,26 @@
 namespace App\Models\Entity;
 
 /**
- * @Entity @Table(name="turma")
+ * @Entity @Table(name="bonificacao_diaria")
  */
-class Turma{
+class Bonificacao_diaria{
     /**
      * @var int
      * @Id @Column(type="integer")
      * @GeneratedValue
      */
-    public $id_turma;
+    public $id_bonificacao_diaria;
     
     /**
      * @var string
      * @Column(type="string")
      */
-    public $nome;
+    public $data_bonus;
     
     /**
      * @var int
      * @Column(type="integer")
      */
-    public $id_professor;
-    /**
-     * @var int
-     * @Column(type="integer")
-     */
-    public $nivel;
-    
+    public $id_jogador;
     
 }
-

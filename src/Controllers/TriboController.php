@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 use App\Models\Entity\ {
     Tribo,
@@ -70,6 +72,18 @@ final class TriboController {
         $tribo->estacoes = $repository->findBy(array('id_tribo' => $tribo->id_tribo));
 
         $response->getBody()->write(json_encode($tribo,  256));
+        return $response->withHeader('Content-type', 'application/json')
+                ->withStatus(200);
+
+    }
+    
+    public function atualizarMoedas(Request $request, Response $response, array $args) : Response{
+        $rsm = new ResultSetMapping;
+        $sp = "call prc_atualizar_moedas;";
+        $query = $this->entityManager->createNativeQuery($sp,$rsm);
+        $result = $query->getResult();
+
+        $response->getBody()->write(json_encode('sucess:true',  256));
         return $response->withHeader('Content-type', 'application/json')
                 ->withStatus(200);
 

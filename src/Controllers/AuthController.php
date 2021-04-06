@@ -75,6 +75,9 @@ final class AuthController {
         $tokenJogadorControler = new TokenJogadorController( $this->container);
         $tokenJogadorControler->inserirTokenJogador($token, $refreshToken, $validade,  $jogador->id_jogador);
         
+        $bonificacaoController = new BonificacaoController($this->container); 
+        $bonificacaoController->InserirBonificacaoPorAcesso($jogador);
+        
         return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken], 200)
             ->withHeader('Content-type', 'application/json'); 
     }
@@ -100,6 +103,9 @@ final class AuthController {
         $token = $this->geraToken($token_jogador->id_jogador, $validade);
         $refreshToken = $this->geraRefreshToken($refreshTokenDecoded->nick_name);
         $tokenJogadorControler->inserirTokenJogador($token, $refreshToken, $validade,  $token_jogador->id_jogador);
+
+        $bonificacaoController = new BonificacaoController($this->container); 
+        $bonificacaoController->InserirBonificacaoPorAcesso($jogador);
         
         return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken], 200)
             ->withHeader('Content-type', 'application/json');

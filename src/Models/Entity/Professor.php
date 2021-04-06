@@ -37,7 +37,7 @@ class Professor{
     public $turmas;
     
     public function login ($passWord){
-        if($this->senha === $passWord){
+        if($this->senha === sha1($passWord)){
             return true;
         }
         return false;

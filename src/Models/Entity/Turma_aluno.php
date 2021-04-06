@@ -31,7 +31,7 @@ class Turma_aluno{
      */
     public $id_aluno;
     
-     /** 
+    /** 
      * @OneToMany(targetEntity="Frequencia", mappedBy="Turma_aluno", cascade={"persist", "remove"}) 
      */
     public $frequencias;

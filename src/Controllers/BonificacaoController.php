@@ -3,6 +3,9 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use App\Models\Entity\{
+    Bonificacao, Bonificacao_diaria
+};
 
 final class BonificacaoController {
     protected $container;
@@ -66,5 +69,36 @@ final class BonificacaoController {
                 ->withStatus(200);
         
    }
-    
+ 
+    public function InserirBonificacaoPorAcesso($jogador){
+        $query = $this->entityManager->createQuery('SELECT u FROM App\Models\Entity\Bonificacao_diaria u '
+        . 'WHERE u.data_bonus = ?1'
+        . 'AND u.id_jogador = ?2');
+        $query->setParameter(1, date("Y-m-d"));
+        $query->setParameter(2, $jogador->id_jogador);
+        $bonusDiario = $query->getResult(); 
+                
+        if(!$bonusDiario){
+            $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
+            $tribo = $repository->findOneBy(array('id_jogador' => $jogador->id_jogador));
+
+            $bonificacao = new Bonificacao();
+            $bonificacao->id_tribo = $tribo->id_tribo;
+            $bonificacao->moedas = 50;
+            $bonificacao->sabedoria = 100;
+            $bonificacao->xp = 100;
+            $bonificacao->descricao = utf8_encode('Bonificação de login diário');
+            $bonificacao->recebida = false;
+            $this->entityManager->persist($bonificacao);
+            
+            $bonusDiario = new Bonificacao_diaria();
+            $bonusDiario->id_jogador = $jogador->id_jogador;
+            $bonusDiario->data_bonus = date("Y-m-d");
+            $this->entityManager->persist($bonusDiario);
+            
+            $this->entityManager->flush();  
+        }
+        
+    }
+   
 }

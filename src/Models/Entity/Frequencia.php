@@ -15,7 +15,7 @@ class Frequencia{
     
     /**
      * @var DateTime
-     * @Column(type="date")
+     * @Column(type="datetime")
      */
     public $data_aula;
     
@@ -36,6 +36,12 @@ class Frequencia{
      * @Column(type="integer")
      */
     public $id_turma_aluno;
+    
+    /**
+     * @OneToOne(targetEntity="Turma_aluno", mappedBy="Frequencia") 
+     * @JoinColumn(name="id_turma_aluno", referencedColumnName="id_turma_aluno")
+     */
+    public $turma_aluno;
     
 }
 

@@ -12,19 +12,18 @@ function slimConfiguration(): \Slim\Container
     $isDevMode = true;
     $dbParams = array(
         'driver'   => 'pdo_mysql',
-        'user'     => 'root',
-        'password' => 'abc123',
-        //'password' => 'Abc@2323',
-        'dbname'   => 'ogs',
+        //'user'     => 'root',
+        //'password' => 'abc123',
+        //'dbname'   => 'ogs',
+        'password' => 'Batata@ogs23',
+        'user'     => 'u694554398_root',
+        'dbname'   => 'u694554398_ogs',
     );
     
     /**
     * Diretório de Entidades e Metadata do Doctrine
     */
-    //ifb
-    //$config = Setup::createAnnotationMetadataConfiguration(array("/var/www/SlimOGS/src/Models/Entity"), $isDevMode);
-    //Local
-    $config = Setup::createAnnotationMetadataConfiguration(array("C:/Apache24/htdocs/SlimOGS/src/Models/Entity"), $isDevMode);
+    $config = Setup::createAnnotationMetadataConfiguration(array($_SERVER['DOCUMENT_ROOT'] ."/src/Models/Entity"), $isDevMode);
    
     $config->addCustomNumericFunction('RAND', 'App\Models\Functions\Rand');
     

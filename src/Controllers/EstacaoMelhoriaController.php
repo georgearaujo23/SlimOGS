@@ -20,7 +20,10 @@ final class EstacaoMelhoriaController {
     public function consultarEstacaomelhoriaPorSabedoria(Request $request, Response $response, array $args) : Response{
         $params = (object) $request->getQueryParams();
         $id_estacao_tipo = $params->id_estacao_tipo;
-
+        
+        $repository = $this->entityManager->getRepository('App\Models\Entity\Tribo');
+        $tribo = $repository->find($params->id_tribo);
+        
         $query = $this->entityManager->createQuery('SELECT u FROM App\Models\Entity\Estacao_melhoria u '
                 . 'WHERE u.id_estacao_tipo = ?1'
                 . 'AND u.pesquisado = 1');
@@ -34,6 +37,10 @@ final class EstacaoMelhoriaController {
                     ->withStatus(200);
         }
 
+        foreach ($estacao_melhoria as $em){
+            $em->custo_moedas *= $tribo->nivel;
+        }
+        
         $response->getBody()->write('{ "melhorias": ' . json_encode($estacao_melhoria,  256) ."}");
         return $response->withHeader('Content-type', 'application/json')
                 ->withStatus(200);

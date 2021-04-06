@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Firebase\JWT\JWT;
 use App\Models\Entity\Jogador;
 
-final class AuthController {
+final class AuthProfessorController {
     protected $container;
     protected $entityManager;
     protected $logger;
@@ -19,18 +19,18 @@ final class AuthController {
         $this->logger = $container['logger'];
     }
     
-    private function geraRefreshToken($nick_name) : string{
+    private function geraRefreshToken($email) : string{
         $refreshTokenPayload = [
-            'nick_name' => $nick_name,
+            'email' => $email,
             'rambom' => uniqid()
         ];
         return JWT::encode($refreshTokenPayload, $this->container['secretkey']);
     }
     
-    private function geraToken($id_jogador, $validade) : string{ 
+    private function geraToken($id_professor, $validade) : string{ 
         $data_criacao = new \DateTime();
         $payload = [
-            "sub" => $id_jogador,
+            "sub" => $id_professor,
             "iss" => "api.guardioesdosaber.com.br",
             "iat" => $data_criacao->format('Y-m-d H:i:s'),
             "expired_at" => $validade->format('Y-m-d H:i:s')
@@ -72,10 +72,10 @@ final class AuthController {
         $token = $this->geraToken($professor->id_professor, $validade);
         $refreshToken = $this->geraRefreshToken($professor->email);
         
-        $tokenJogadorControler = new TokenJogadorController( $this->container);
-        $tokenJogadorControler->inserirTokenJogador($token, $refreshToken, $validade,  $jogador->id_jogador);
+        $tokenProfessorControler = new TokenProfessorController( $this->container);
+        $tokenProfessorControler->inserirTokenProfessor($token, $refreshToken, $validade,  $professor->id_professor);
         
-        return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken], 200)
+        return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken, "id_professor" => $professor->id_professor], 200)
             ->withHeader('Content-type', 'application/json'); 
     }
     
@@ -87,9 +87,9 @@ final class AuthController {
             ['HS256']
         );
         
-        $tokenJogadorControler = new TokenJogadorController($this->container);
-        $token_jogador = $tokenJogadorControler->consultarPorRefreshToken($params->refreshToken);
-        if(is_null($token_jogador)){
+        $tokenProfessorControler = new TokenProfessorController($this->container);
+        $token_professor = $tokenProfessorControler->consultarPorRefreshToken($params->refreshToken);
+        if(is_null($token_professor)){
             return $response->withJson(json_encode(['message' => 'RefreshToken invalido'],  256))
                     ->withHeader('Content-type', 'application/json')
                     ->withStatus(401);
@@ -97,11 +97,11 @@ final class AuthController {
         
         $validade = new \DateTime();
         date_time_set( $validade , 23 , 59 , 59 );
-        $token = $this->geraToken($token_jogador->id_jogador, $validade);
-        $refreshToken = $this->geraRefreshToken($refreshTokenDecoded->nick_name);
-        $tokenJogadorControler->inserirTokenJogador($token, $refreshToken, $validade,  $token_jogador->id_jogador);
+        $token = $this->geraToken($token_professor->id_professor, $validade);
+        $refreshToken = $this->geraRefreshToken($refreshTokenDecoded->email);
+        $tokenProfessorControler->inserirTokenProfessor($token, $refreshToken, $validade,  $token_professor->id_professor);
         
-        return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken], 200)
+        return $response->withJson(["apiToken" => $token, "apiRefreshToken" => $refreshToken, "id_professor" => $token_professor->id_professor], 200)
             ->withHeader('Content-type', 'application/json');
     }
 }
